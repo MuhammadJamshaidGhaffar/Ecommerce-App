@@ -13,19 +13,42 @@ from GLOBAL_VARIABLES import USER_COLLECTION_NAME
 class Get_User_Handler():
     async def on_post(self , req,res):
         body = await req.get_media()
-        print("step 1")
+        print("Request on /get_user ---post")
+        print("Body = ", body)
+        for key, value in body.items():
+            print(key, value, type(value))
+        try:
+            username = body["username"]
+            password = body["password"]
+        except Exception as error:
+            res.status = 403
+            res.text = json.dumps({"msg":"UserName and Password are required fields " })
+            return
+        data = {
+            "collection": USER_COLLECTION_NAME,
+            "range": [0, 1],
+            "filters": {
+                "username": username,
+                "password":password
+            }
+        }
+        headers = {"content-type": "application/json"}
+
         # sends this request to database
         async with aiohttp.ClientSession() as session:
-            body["collection"] = USER_COLLECTION_NAME
-            print("step 2")
-            headers = {"content-type": "application/json"}
             print("Step 3")
             try:
-                response = await session.post(f"{HOST}:{DB_PORT}/get_document", data=json.dumps(body), headers=headers)
-                response = await response.json()
+                response = await session.post(f"{HOST}:{DB_PORT}/get_document", data=json.dumps(data), headers=headers)
+                response = json.loads(await response.json())
+                print(type(response))
+                if len(response["documents"]) == 0:
+                    res.status = 401
+                    res.text = json.dumps({"msg":"Incorrect username or password"})
+                    return
+                user = response["documents"][0]
                 print("Response = ", response)
                 res.status = 200
-                res.text = json.dumps(response)
+                res.text = json.dumps(user)
                 return
             except Exception as error:
                 print("Failed to Fetch user from database")
@@ -44,9 +67,9 @@ class User_Handler:
         try:
             username = body["username"]
             password = body["password"]
-        except :
+        except Exception as error:
             res.status = 403
-            res.rext = "UserName and Password are required fields "
+            res.text = json.dumps({"msg": "UserName and Password are required fields "})
             return
         print("[/user -- post -- ]Syntax is correct")
         # Instantitate User Object

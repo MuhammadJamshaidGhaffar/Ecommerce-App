@@ -2,3 +2,5 @@
 Database/
 Server/__pycache__/
 Shared_Resources/__pycache__/
+Server/Images/
+Client/__pycache__

@@ -15,7 +15,7 @@ app = falcon.asgi.App()
 app.add_route("/image" , Image())
 
 app.add_route("/user" , User_Handler())
-app.add_route("/get_user" , Get_User_Handler())
+app.add_route("/login" , Get_User_Handler())
 
 app.add_route("/get_product" , Get_Product_Handler())
 app.add_route("/product" , Product_Handler())
