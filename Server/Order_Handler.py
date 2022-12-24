@@ -35,8 +35,8 @@ class Order_Handler():
         #check if body contains all the required properties of prouct class
         try:
             product_id = body["product_id"]
-            payment_method = body["payment_method"]
             user_id = body["user_id"]
+            delivery_address = body["delivery_address"]
         except Exception as error:
             res.status = 404
             res.text = json.dumps({"msg":"Missing required properties of product class "+ str(error)})
@@ -44,7 +44,7 @@ class Order_Handler():
         print("/Order --post -- all fields are present")
         # instantiate product object
         try:
-            order = Order(product_id , payment_method , user_id)
+            order = Order(product_id  , user_id , delivery_address)
         except Exception as error:
             print(str(error))
         print("order instantiated")

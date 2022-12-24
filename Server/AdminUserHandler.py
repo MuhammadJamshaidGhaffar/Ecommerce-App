@@ -3,17 +3,17 @@ import aiohttp , json
 
 ####################### My Shared Resources #########################
 sys.path.append("../Shared_Resources/")
-from utility_classes import User
+from utility_classes import AdminUser
 from SHARED_GLOBAL_VARIABLES import  HOST , DB_PORT
 
 ################## My Resources ###############################
-from GLOBAL_VARIABLES import USER_COLLECTION_NAME
+from GLOBAL_VARIABLES import ADMIN_USER_COLLECTION_NAME
 
 
-class Login_Handler():
+class Admin_Login_Handler():
     async def on_post(self , req,res):
         body = await req.get_media()
-        print("Request on /get_user ---post")
+        print("Request on /login_admin ---post")
         print("Body = ", body)
         for key, value in body.items():
             print(key, value, type(value))
@@ -25,7 +25,7 @@ class Login_Handler():
             res.text = json.dumps({"msg":"UserName and Password are required fields " })
             return
         data = {
-            "collection": USER_COLLECTION_NAME,
+            "collection": ADMIN_USER_COLLECTION_NAME,
             "range": [0, 1],
             "filters": {
                 "$or": [{"username": username}, {
@@ -53,16 +53,16 @@ class Login_Handler():
                 res.text = json.dumps(user)
                 return
             except Exception as error:
-                print("Failed to Fetch user from database")
+                print("Failed to Fetch Admin user from database")
                 print(error)
                 res.status = 404
                 res.text = json.dumps({"msg": error})
                 return
 
-class Get_User_Handler():
+class Admin_Get_User_Handler():
     async def on_post(self , req,res):
         body = await req.get_media()
-        print("Request on /get_user ---post")
+        print("Request on /get_admin_user ---post")
         print("Body = ", body)
         for key, value in body.items():
             print(key, value, type(value))
@@ -76,7 +76,7 @@ class Get_User_Handler():
             res.text = json.dumps({"msg":"_id is required to get user " })
             return
         data = {
-            "collection": USER_COLLECTION_NAME,
+            "collection": ADMIN_USER_COLLECTION_NAME,
             "range": [0, 1],
             "_id":_id,
             "output":output
@@ -99,16 +99,16 @@ class Get_User_Handler():
                 res.text = json.dumps(user)
                 return
             except Exception as error:
-                print("Failed to Fetch user from database")
+                print("Failed to Fetch Admin user from database")
                 print(error)
                 res.status = 404
                 res.text = json.dumps({"msg": error})
                 return
 
-class User_Handler:
+class Admin_User_Handler:
     async def on_post(self, req, res):
         body = await req.get_media()
-        print("Request on /user ---post")
+        print("Request on /user_admin ---post")
         print("Body = " , body)
         for key, value in body.items():
             print(key, value, type(value))
@@ -123,14 +123,14 @@ class User_Handler:
             res.text = json.dumps({"msg": "Email , UserName and Password are required fields "})
             return
 
-        print("[/user -- post -- ]Syntax is correct")
+        print("[/user_admin -- post -- ]Syntax is correct")
         # Instantitate User Object
-        user = User(email , username , password)
+        admin_user = AdminUser(email , username , password)
         # insert user on database
         async with aiohttp.ClientSession() as session :
             #first check if user  already exists
             data = {
-                "collection" : USER_COLLECTION_NAME,
+                "collection" : ADMIN_USER_COLLECTION_NAME,
                 "range": [0, -1],
                 "filters": {
                     "$or": [{"username": username}, {
@@ -146,21 +146,21 @@ class User_Handler:
                 response = json.loads(response)
                 print("response for get_users check is =", response)
                 if len(response["documents"]) > 0:
-                    msg = "UserName or email Already exists"
+                    msg = "An already Admin Account with this UserName or email exists"
                     print(msg)
                     res.status = 404
                     res.text = json.dumps({"msg":msg})
                     return
             except Exception as error :
-                print("Failed to check if user alreay exists on database ", error)
+                print("Failed to check if Admin user alreay exists on database ", error)
                 res.status = 401
                 res.text = json.dumps({"msg": error})
                 return
 
-            print("User doesn't exists \nNow creating the document")
+            print("Admin User doesn't exists \nNow creating the document")
             data = {
-                "collection" : USER_COLLECTION_NAME,
-                "data" : user.__dict__
+                "collection" : ADMIN_USER_COLLECTION_NAME,
+                "data" : admin_user.__dict__
             }
             headers = {"content-type":"application/json"}
             try:
@@ -171,14 +171,14 @@ class User_Handler:
                 res.text = json.dumps(response)
                 return
             except Exception as error:
-                print("Failed to create user on database " , error)
+                print("Failed to create Admin user on database " , error)
                 res.status = 404
                 res.text = json.dumps({"msg":error})
                 return
     async def on_put(self,req,res):
         body = await req.get_media()
         if "_id" not in body  or "update" not in body:
-            msg = "user _id or update is missing"
+            msg = "admin user _id or update is missing"
             res.status = 401
             res.text = json.dumps({"msg":msg})
             print(msg)
@@ -187,7 +187,7 @@ class User_Handler:
         #sends this request to database
         async with aiohttp.ClientSession() as session :
             data = {
-                "collection": USER_COLLECTION_NAME,
+                "collection": ADMIN_USER_COLLECTION_NAME,
                 "_id":body["_id"],
                 "update": body["update"]
             }
@@ -209,8 +209,8 @@ class User_Handler:
                 return
     async def on_delete(self,req,res):
         body = await req.get_media()
-        if "username" not in body or "password" not in body:
-            msg = "Username or password  is missing"
+        if "_id" not in body :
+            msg = "admin _id is required to delete admin account"
             res.status = 401
             res.text = json.dumps({"msg":msg})
             print(msg)
@@ -219,12 +219,8 @@ class User_Handler:
         #sends this request to database
         async with aiohttp.ClientSession() as session :
             data = {
-                "collection": USER_COLLECTION_NAME,
-                "range": [0, -1],
-                "filters":{
-                    "username" : body["username"],
-                    "password" : body["password"]
-                },
+                "collection": ADMIN_USER_COLLECTION_NAME,
+                "_id":body["_id"],
             }
             print("step 2")
             headers = {"content-type":"application/json"}
@@ -237,7 +233,7 @@ class User_Handler:
                 res.text = json.dumps(response)
                 return
             except Exception as error:
-                print("Failed to delete user on server")
+                print("Failed to delete Admin user on server")
                 print(error)
                 res.status = 404
                 res.text = json.dumps({"msg":error})

@@ -1,13 +1,17 @@
 
-
-
-from login_page import *
-from signup_page import *
-from MainPage import *
+from PyQt6.QtWidgets import *
+from PyQt6.QtCore import *
 import functools
 import sys
 
+from global_vars import  *
 
+
+
+########## Pages ###########
+from login_page import *
+from AdminPage import *
+from orderPage import *
 
 
 
@@ -18,16 +22,11 @@ class Window:
     def __init__(self):
 
 
-        self.loginWindow = LoginWindow(self.on_login_success , self.on_login_error)
-        self.signupWindow = SignUpWindow()
+        self.loginWindow = LoginWindow(self.on_login_success )
         self.mainWindow = None
         # current active window
         self.window = self.loginWindow
         self.window.show()
-
-        # connecting login btn in signup page with login window
-        self.loginWindow.signup_btn.clicked.connect(functools.partial(self.setWindow , self.signupWindow))
-
 
 
 
@@ -40,11 +39,16 @@ class Window:
 
     def on_login_success(self , user_data):
         globalVars["loggedInUserInfo"] = user_data
-        self.mainWindow = MainWindow()
-        self.setWindow(self.mainWindow)
+        print("User has been logged in")
+        print(user_data)
+        try:
+            self.mainWindow = MainWindow()
+            self.setWindow(self.mainWindow)
+        except Exception as error:
+            print(error)
 
-    def on_login_error(self , error_tuple):
-        print(error_tuple)
+
+
 
 
 
@@ -52,7 +56,8 @@ class Window:
 app = QApplication([])
 
 window = Window()
-#window = QMainWindow()
+
+#window = OrderPage("2b2e51f3-c6fc-4b17-a57b-dd275f3e5f94")
 #window.show()
 
 app.exec()
