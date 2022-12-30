@@ -1,15 +1,11 @@
 
-
-
 from login_page import *
 from signup_page import *
 from MainPage import *
 import functools
 import sys
 
-
-
-
+import global_vars
 
 ####    My Resources  ###########
 sys.path.append("../Shared_Resources/")
@@ -25,10 +21,8 @@ class Window:
         self.window = self.loginWindow
         self.window.show()
 
-        # connecting login btn in signup page with login window
+        # connecting signup tbn in login window with signup window
         self.loginWindow.signup_btn.clicked.connect(functools.partial(self.setWindow , self.signupWindow))
-
-
 
 
 
