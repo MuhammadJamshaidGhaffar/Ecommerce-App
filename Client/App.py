@@ -15,7 +15,7 @@ class Window:
 
 
         self.loginWindow = LoginWindow(self.on_login_success , self.on_login_error)
-        self.signupWindow = SignUpWindow()
+        self.signupWindow = SignUpWindow(self.onSignUpSuccess)
         self.mainWindow = None
         # current active window
         self.window = self.loginWindow
@@ -38,7 +38,16 @@ class Window:
         self.setWindow(self.mainWindow)
 
     def on_login_error(self , error_tuple):
-        print(error_tuple)
+        print(error_tuple[0])
+        print(type(error_tuple[0]))
+        try:
+            self.loginWindow.error_label.setText(error_tuple[0])
+        except Exception as error:
+            print(error)
+
+    def onSignUpSuccess(self , data):
+        print("signup succesfull")
+        self.setWindow(self.loginWindow)
 
 
 

@@ -24,10 +24,12 @@ class CartPage(QWidget):
         uic.loadUi('./ui/cart.ui', self)
         self.cart = []
 
+        self.place_order_response.setText("Fetching cart data")
         worker = Worker(self.fetchCart)
         worker.signals.finished.connect(self.onCartFetchSuccess)
         worker.signals.error.connect(self.onCartFetchError)
         worker.threadPool.start(worker)
+
 
         # form to hold cart products
         self.scrollbar_inside_widget = QWidget()  # Widget that contains the collection of Vertical Box
@@ -68,9 +70,11 @@ class CartPage(QWidget):
         return responseDict
 
     def onCartFetchSuccess(self , user):
+        self.place_order_response.setText("Cart data fetched susccessfully")
         self.cart = user["cart"]
         print(self.cart)
         self.clearScrollArea()
+        self.place_order_response.setText("Getting data for products in cart")
         for product_id in self.cart:
             self.startWorkertoGetProduct(product_id)
 
@@ -79,6 +83,7 @@ class CartPage(QWidget):
 
     def onCartFetchError(self , error):
         print(error)
+        self.place_order_response.setText("Something Went Wrong! Failed to fetch cart data")
 
     def startWorkertoGetProduct(self , _id):
         worker = Worker(self.fetchProduct , _id = _id)
@@ -144,6 +149,7 @@ class CartPage(QWidget):
             print(error)
 
     def startWorkerToPlaceOrder(self , product_id , user_id , delivery_address):
+        self.place_order_response.setText("placing orders")
         print("starting worker")
         worker = Worker(self.fetchPlaceOrder , product_id = product_id , user_id = user_id , delivery_address = delivery_address)
         worker.signals.finished.connect(self.onPlaceOrderSuccess)

@@ -30,7 +30,7 @@ class LoginWindow(QWidget):
             print("Username Fetched Response = " , responseDict)
             return responseDict
 
-
+        self.error_label.setText("Checking credentials")
         worker = Worker(fetch , username=self.username_lineedit.text(), password=self.password_lineedit.text())
         worker.signals.finished.connect(self.on_login_success)
         worker.signals.error.connect(self.on_login_error)
