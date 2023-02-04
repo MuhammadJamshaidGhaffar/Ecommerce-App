@@ -59,7 +59,8 @@ class MainWindow(QWidget):
                 "output":{
                     "_id":1,
                     "product_id":1,
-                    "order_status":1
+                    "order_status":1,
+                    "placed_on":1
                 }
             }
             headers = {"content-type": "application/json"}
@@ -72,7 +73,12 @@ class MainWindow(QWidget):
             print("Wrong :" , responseDict["msg"])
             raise Exception(responseDict["msg"])
 
+
         responseDict = json.loads(responseDict)
+        print("Printing type of date")
+        print(type(responseDict["documents"][0]["placed_on"]))
+        print(responseDict["documents"][0]["placed_on"])
+        responseDict["documents"].sort(reverse=True, key=lambda order: order["placed_on"])
         print("Order Fetched Response = ", responseDict )
         return responseDict
 
