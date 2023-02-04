@@ -20,7 +20,7 @@ Created in Python with falcon library
 
 ### How to use
 - clone the repository
-- you need jamshaid dB for this app so clone [Jamshaid dB](http:/https://github.com/MuhammadJamshaidGhaffar/jamshaid-db/ "Jamshaid dB")
+- you need jamshaid dB for this app so clone [Jamshaid dB](https://github.com/MuhammadJamshaidGhaffar/jamshaid-db/ "Jamshaid dB")
 - install all dependencies like python , python falcon , pyQt
 - inside server folder run start.bat
 ![image](https://user-images.githubusercontent.com/75721211/216750175-6d01a41f-55ec-4609-82b5-be137d13c739.png)
